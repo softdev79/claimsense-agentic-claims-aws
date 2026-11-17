@@ -25,6 +25,13 @@ deploy.ps1 ── docker build/push ──────────► ECR
                                             CloudWatch Logs · Security group (your IP only) · AWS Budget alerts
 ```
 
+## Screenshots
+
+**Claimant portal on AWS (ECS Fargate):** sample claim CLM-1001 processed end to end by the agent on Amazon Bedrock.
+It was auto-approved for ₹12,050 (repair ₹20,700 − depreciation ₹7,650 − deductible ₹1,000), with an AI-written decision letter.
+
+![ClaimSense claimant portal: CLM-1001 auto-approved for Rs.12,050 with the decision letter](docs/screenshots/portal-claimant-approved.png)
+
 ## Results (20 labelled claims, `python -m evals.run_evals`)
 
 | Metric | Result |
