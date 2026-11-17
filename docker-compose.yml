@@ -1,0 +1,20 @@
+# ClaimSense | Author: Vishal Gupta (AWS capstone edition), based on ClaimSense by Shivank Agrawal
+# Run locally:  docker compose up --build   -> portal http://localhost:8501 , API http://localhost:8000/docs
+services:
+  api:
+    build: .
+    env_file: .env                     # must contain OPENAI_API_KEY
+    ports: ["8000:8000"]
+    volumes:
+      - claims-data:/app/data          # keeps claims and paused graphs across restarts
+
+  ui:
+    build: .
+    command: ["streamlit", "run", "ui/portal.py", "--server.port", "8501", "--server.address", "0.0.0.0", "--server.headless", "true"]
+    environment:
+      API_URL: http://api:8000         # containers reach each other by service name
+    ports: ["8501:8501"]
+    depends_on: [api]
+
+volumes:
+  claims-data:

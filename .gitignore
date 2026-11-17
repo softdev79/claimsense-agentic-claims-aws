@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.pyc
+data/checkpoints.db
+data/uploads/
+data/policy_index.json
+evals/results_*.csv
+deploy/terraform/.terraform/
+deploy/terraform/*.tfstate*
+deploy/terraform/.terraform.lock.hcl
+venv/
+.venv/
+.idea/
+*.tfstate
+*.tfstate.*
+.terraform/

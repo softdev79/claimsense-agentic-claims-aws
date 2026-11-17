@@ -1,0 +1,16 @@
+# ClaimSense - Agentic Motor Insurance Claims Processor | Author: Vishal Gupta (AWS capstone edition), based on ClaimSense by Shivank Agrawal
+# Tested with Python 3.12 and the exact versions below.
+openai==3.51.0
+langgraph==1.2.22
+langgraph-checkpoint-sqlite==3.1.3
+pydantic==2.13.5
+numpy==2.5.3
+fastapi==0.163.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+streamlit==1.67.0
+pandas==3.0.5
+requests==2.34.2
+reportlab==5.0.1
+python-dotenv==1.2.3
+pypdf==7.1.0          # PDF text extraction (fallback for text-only Bedrock models)

@@ -1,0 +1,11 @@
+.env
+__pycache__
+data/checkpoints.db
+data/uploads
+evals/results_*.csv
+deploy/terraform
+docs
+venv
+.venv
+.idea
+.git

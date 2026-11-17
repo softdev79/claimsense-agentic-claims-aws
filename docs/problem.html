@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimSense — Problem Statement | Shivank Agrawal</title>
+<style>
+  :root { --ink:#1f2937; --muted:#6b7280; --accent:#4338ca; --accent-soft:#eef2ff; --line:#e5e7eb;
+          --ok:#047857; --ok-soft:#ecfdf5; --warn:#b45309; --warn-soft:#fffbeb; --bad:#b91c1c; --bad-soft:#fef2f2; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink);
+         line-height:1.65; background:#f8fafc; }
+  header { background: linear-gradient(135deg,#312e81,#4338ca 55%,#0ea5e9); color:#fff; padding:48px 24px 40px; }
+  header .wrap { max-width:1000px; margin:0 auto; }
+  header .kicker { text-transform:uppercase; letter-spacing:.12em; font-size:13px; opacity:.85; }
+  header h1 { margin:8px 0 10px; font-size:34px; line-height:1.2; }
+  header p { margin:0; font-size:17px; opacity:.95; max-width:760px; }
+  .meta { margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; }
+  .pill { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); padding:4px 12px; border-radius:999px; font-size:13px; }
+  main { max-width:1000px; margin:0 auto; padding:24px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px 28px; margin:20px 0; }
+  h2 { margin-top:0; font-size:23px; color:#111827; }
+  h2 .num { display:inline-block; background:var(--accent); color:#fff; border-radius:8px; padding:0 9px; margin-right:8px; font-size:17px; }
+  h3 { font-size:18px; margin-bottom:6px; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:#f3f4f6; }
+  tr:nth-child(even) td { background:#fafafa; }
+  code { background:#f1f5f9; padding:1px 6px; border-radius:5px; font-size:.92em; }
+  pre { background:#0f172a; color:#e2e8f0; padding:14px 16px; border-radius:10px; overflow:auto; font-size:13.5px; line-height:1.5; }
+  pre code { background:none; padding:0; }
+  .callout { border-left:5px solid var(--accent); background:var(--accent-soft); padding:12px 16px; border-radius:8px; margin:14px 0; }
+  .callout.warn { border-color:var(--warn); background:var(--warn-soft); }
+  .callout.ok { border-color:var(--ok); background:var(--ok-soft); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .box { border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fcfcfd; }
+  .box b { display:block; margin-bottom:4px; }
+  .milestone { border:1px solid var(--line); border-radius:12px; padding:14px 18px; margin:14px 0; }
+  .milestone h3 { margin-top:0; }
+  .milestone .time { float:right; color:var(--muted); font-size:14px; }
+  .accept { color:var(--ok); font-weight:600; }
+  footer { text-align:center; color:var(--muted); font-size:14px; padding:30px 0 50px; }
+  nav.toc { font-size:15px; }
+  nav.toc a { color:var(--accent); text-decoration:none; }
+  nav.toc ol { columns:2; margin:0; }
+  @media (max-width:700px){ nav.toc ol { columns:1; } header h1 { font-size:27px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="kicker">Agentic AI Portfolio Project · Interview-style problem statement</div>
+    <h1>ClaimSense: Build an Agentic Motor Insurance Claims Processor</h1>
+    <p>Read claim documents, decide coverage by citing the policy wording, calculate the exact payable amount,
+       catch suspicious claims, and keep a human in charge of every rejection, then deploy it on AWS.</p>
+    <div class="meta">
+      <span class="pill">Author: Shivank Agrawal</span>
+      <span class="pill">Level: Advanced</span>
+      <span class="pill">Effort: ~9 weeks part-time (10 hrs/week)</span>
+      <span class="pill">Roles: FDE · AI Engineer · Applied ML</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <nav class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#scenario">The scenario</a></li>
+      <li><a href="#primer">Motor insurance in 5 minutes</a></li>
+      <li><a href="#given">What you are given</a></li>
+      <li><a href="#build">What you must build</a></li>
+      <li><a href="#rules">Business rules</a></li>
+      <li><a href="#nfr">Non-functional requirements</a></li>
+      <li><a href="#milestones">Milestones and acceptance criteria</a></li>
+      <li><a href="#eval">How your work will be judged</a></li>
+      <li><a href="#hints">Hints (read only if stuck)</a></li>
+      <li><a href="#cv">What goes on your CV</a></li>
+    </ol>
+  </nav>
+</section>
+
+<section id="scenario">
+  <h2><span class="num">1</span>The scenario</h2>
+  <p>You have just joined <b>NorthStar General Insurance</b> (a fictional Indian insurer) as a
+     <b>Forward Deployed Engineer</b>. On day one, the Head of Motor Claims tells you:</p>
+  <div class="callout">
+    “We settle about 1,200 private-car claims a month. Every claim is read by a person: the claim form,
+    the surveyor's report, sometimes a police FIR. Small, obvious claims wait in the same queue as complex ones,
+    so customers wait a week for a ₹12,000 bumper repair. Meanwhile some fraudulent claims slip through because
+    nobody has time to compare documents carefully. I want an AI system that clears the easy claims in minutes,
+    sends the risky ones to the right expert with everything they need, and never rejects a customer
+    without a human signing off. And I need to see the cost per claim and an audit trail for the regulator.”
+  </div>
+  <p>Your job is to design, build, evaluate and deploy that system. The numbers above are part of the scenario,
+     not real company data.</p>
+</section>
+
+<section id="primer">
+  <h2><span class="num">2</span>Motor insurance in 5 minutes</h2>
+  <p>You don't need insurance experience. These are the only terms you need:</p>
+  <table>
+    <tr><th>Term</th><th>Meaning</th><th>Why it matters for the code</th></tr>
+    <tr><td><b>Comprehensive (Package) policy</b></td><td>Covers damage to your own car (Section I) and liability to others (Section II)</td><td>Only these policies can pay for own damage</td></tr>
+    <tr><td><b>Third Party (Liability Only)</b></td><td>Covers only damage you cause to others</td><td>Own-damage claim on a TP policy must be rejected</td></tr>
+    <tr><td><b>IDV</b> (Insured Declared Value)</td><td>Roughly the car's market value. The maximum the insurer pays</td><td>Cap every payout at IDV</td></tr>
+    <tr><td><b>Depreciation</b></td><td>Replaced parts are paid at a discount (plastic 50%, metal by car age…)</td><td>Must be calculated line by line from the surveyor's table</td></tr>
+    <tr><td><b>Zero Depreciation add-on</b></td><td>Customer paid extra so no depreciation is deducted</td><td>Changes the payable amount a lot</td></tr>
+    <tr><td><b>Compulsory deductible</b></td><td>Fixed amount the customer always bears (₹1,000 or ₹2,000)</td><td>Subtract from every claim</td></tr>
+    <tr><td><b>Surveyor</b></td><td>Independent licensed inspector who examines the car and assesses the loss</td><td>The surveyor's report is the source of truth for amounts</td></tr>
+    <tr><td><b>FIR</b></td><td>Police First Information Report</td><td>May reveal drunk driving or a different accident date</td></tr>
+    <tr><td><b>Total loss / CTL</b></td><td>Repair cost above 75% of IDV, so the car is a write-off</td><td>Settled on IDV, always needs a claims officer</td></tr>
+    <tr><td><b>SIU</b></td><td>Special Investigation Unit: the insurer's fraud team</td><td>Suspicious claims go here instead of to a normal adjuster</td></tr>
+  </table>
+</section>
+
+<section id="given">
+  <h2><span class="num">3</span>What you are given</h2>
+  <div class="grid">
+    <div class="box"><b>📄 data/policy_wording.md</b>19 numbered clauses (OD-1, DEP-1, EXC-4, LIM-1…) of a private car package policy.</div>
+    <div class="box"><b>🗄️ data/claims.db (SQLite)</b><code>policies</code> (25), <code>prior_claims</code>, <code>garages</code> (13, two on a fraud watchlist).</div>
+    <div class="box"><b>📁 data/sample_claims/</b>20 claims (CLM-1001…1020). Each has <code>claim_form.pdf</code>, <code>survey_report.pdf</code> and sometimes <code>fir.pdf</code>.</div>
+    <div class="box"><b>✅ data/eval_labels.csv</b>The correct route, recommendation, fraud label and payable amount for every sample claim.</div>
+  </div>
+  <p>The PDFs use Indian formats on purpose: dates like <code>21/10/2026</code>, times like <code>6:40 PM</code>,
+     amounts like <code>Rs. 22,500</code>. Some claims contain traps: a drunk-driving note only in the FIR, a
+     story that contradicts the surveyor, an accident date that doesn't match the police record.</p>
+  <p>Regenerate everything at any time with <code>python -m scripts.generate_data</code> (no API key needed).</p>
+</section>
+
+<section id="build">
+  <h2><span class="num">4</span>What you must build</h2>
+  <p>A system that takes the PDFs of one claim and produces one of three outcomes:</p>
+  <table>
+    <tr><th>Route</th><th>When</th><th>What happens</th></tr>
+    <tr><td><b>AUTO_APPROVE</b></td><td>Covered, low fraud risk, amount within limit, confident decision</td><td>Claim is approved and the customer letter is sent. No human involved.</td></tr>
+    <tr><td><b>ADJUSTER_REVIEW</b></td><td>Large amount, total loss, medium fraud score, uncertain coverage, or any recommended rejection</td><td>Claim waits in the adjuster queue with the AI's recommendation and evidence.</td></tr>
+    <tr><td><b>SIU_INVESTIGATION</b></td><td>High fraud score</td><td>Claim waits in the fraud team's queue with every red flag listed.</td></tr>
+  </table>
+  <p>For every claim, the system must also store: extracted document data, policy check result, coverage
+     decision with clause citations, the full payable calculation, fraud signals, the route, an audit trail of every
+     step, the cost of the LLM calls, and finally the customer letter.</p>
+</section>
+
+<section id="rules">
+  <h2><span class="num">5</span>Business rules (from the Head of Claims)</h2>
+  <table>
+    <tr><th>Rule</th><th>Value</th></tr>
+    <tr><td>Auto-approve limit</td><td>Payable ≤ ₹50,000</td></tr>
+    <tr><td>Fraud score for adjuster review</td><td>25–49</td></tr>
+    <tr><td>Fraud score for SIU</td><td>≥ 50</td></tr>
+    <tr><td>Total loss</td><td>Surveyor's assessed cost &gt; 75% of IDV → pay IDV minus deductible, human approval</td></tr>
+    <tr><td>Late reporting</td><td>More than 7 days after the accident is a fraud signal, not a rejection</td></tr>
+    <tr><td>New policy</td><td>Accident within 30 days of policy start is a fraud signal</td></tr>
+    <tr><td>Inflated estimate</td><td>Garage estimate &gt; 140% of surveyor's assessment is a fraud signal</td></tr>
+    <tr><td>Repeat claimant</td><td>2+ claims on the policy in the previous 12 months is a fraud signal</td></tr>
+    <tr><td>Rejections</td><td><b>The AI may recommend a rejection but must never reject on its own</b></td></tr>
+  </table>
+  <p>You decide how many points each fraud signal is worth, but you must be able to explain the choice.</p>
+</section>
+
+<section id="nfr">
+  <h2><span class="num">6</span>Non-functional requirements</h2>
+  <ul>
+    <li><b>Explainable money:</b> every rupee of the payable amount must be traceable to a line in the surveyor's table and a clause in the policy.</li>
+    <li><b>Grounded coverage decisions:</b> an exclusion must cite a clause ID that actually exists in the policy wording.</li>
+    <li><b>Pause and resume:</b> a claim waiting for a human must survive a server restart.</li>
+    <li><b>Audit trail:</b> who (agent or which person) did what, when, with what result.</li>
+    <li><b>Cost:</b> report the LLM cost per claim. Target: under ₹2 per claim.</li>
+    <li><b>Latency:</b> under 30 seconds per claim end to end.</li>
+    <li><b>Secrets:</b> the OpenAI key must never be in code, Docker images or Terraform state.</li>
+    <li><b>Integration:</b> a REST API so the insurer's other systems can submit claims and fetch decisions.</li>
+  </ul>
+</section>
+
+<section id="milestones">
+  <h2><span class="num">7</span>Milestones and acceptance criteria</h2>
+
+  <div class="milestone"><span class="time">~1 week</span>
+    <h3>M1 · Domain and data</h3>
+    <p>Load the policies, garages and prior claims. Write a function that returns a policy by number and counts prior claims in the last 12 months.</p>
+    <p class="accept">✔ Done when: you can explain every table and every column, and query CLM-1018's policy history.</p>
+  </div>
+
+  <div class="milestone"><span class="time">~1.5 weeks</span>
+    <h3>M2 · Document intake</h3>
+    <p>Turn each PDF into typed JSON with an LLM: claim form, survey report (including the line-item table), FIR.
+       Normalise dates to <code>YYYY-MM-DD</code>, times to 24-hour, amounts to numbers.</p>
+    <p class="accept">✔ Done when: all 20 claims extract without errors and the survey line items add up to the printed total.</p>
+  </div>
+
+  <div class="milestone"><span class="time">~2 weeks</span>
+    <h3>M3 · The agent (LangGraph)</h3>
+    <p>Build the steps: policy check → coverage check (retrieve clauses, LLM decides, cite clause IDs) →
+       amount assessment (depreciation, deductible, IDV cap, total loss) → fraud check (rules + document
+       contradictions) → routing. Skip steps that are pointless when the policy check already failed.</p>
+    <p class="accept">✔ Done when: CLM-1001 is auto-approved for exactly ₹12,050, CLM-1014 is recommended for rejection citing the drunk-driving clause, and CLM-1019 goes to SIU.</p>
+  </div>
+
+  <div class="milestone"><span class="time">~1.5 weeks</span>
+    <h3>M4 · Human-in-the-loop and portals</h3>
+    <p>Pause the graph for adjuster / SIU decisions and resume it later. Build a REST API and a simple portal
+       with four views: claimant, adjuster, SIU, dashboard. Overriding the AI must require a written note.</p>
+    <p class="accept">✔ Done when: you can stop the server, restart it, approve a waiting claim, and the customer letter is generated.</p>
+  </div>
+
+  <div class="milestone"><span class="time">~1.5 weeks</span>
+    <h3>M5 · Evals and observability</h3>
+    <p>Run all 20 labelled claims and report route accuracy, recommendation accuracy, fraud precision and recall,
+       payable accuracy, straight-through rate, cost and latency per claim.</p>
+    <p class="accept">✔ Done when: one command prints the scorecard, and you can explain every wrong answer.</p>
+  </div>
+
+  <div class="milestone"><span class="time">~1.5 weeks</span>
+    <h3>M6 · Deployment</h3>
+    <p>Containerise the API and portal. Deploy to AWS with infrastructure as code. The OpenAI key must come from a
+       secrets store. Provide a one-command teardown.</p>
+    <p class="accept">✔ Done when: a reviewer opens your public URL, processes a sample claim, and you then delete every resource with one command.</p>
+  </div>
+</section>
+
+<section id="eval">
+  <h2><span class="num">8</span>How your work will be judged</h2>
+  <table>
+    <tr><th>Area</th><th>Weight</th><th>What a strong submission shows</th></tr>
+    <tr><td>Correctness</td><td>30%</td><td>Eval scorecard, exact payable amounts, no claim lost in a FAILED state without a reason</td></tr>
+    <tr><td>Architecture choices</td><td>25%</td><td>Clear split: what the LLM does vs what code does, and why</td></tr>
+    <tr><td>Safety and auditability</td><td>20%</td><td>Grounded citations, human sign-off on rejections, audit trail, secrets handling</td></tr>
+    <tr><td>Production readiness</td><td>15%</td><td>API, pause/resume, Docker, IaC deployment and teardown, cost tracking</td></tr>
+    <tr><td>Communication</td><td>10%</td><td>README, architecture diagram, can defend trade-offs in an interview</td></tr>
+  </table>
+  <div class="callout warn"><b>Interview reality check:</b> you will be asked “Why didn't you let the LLM calculate the
+  amount?”, “What happens if the model invents a clause?”, “How do you know your fraud check works?”, and
+  “What does one claim cost?” Build so that you can answer each with a number or a line of code.</div>
+</section>
+
+<section id="hints">
+  <h2><span class="num">9</span>Hints (read only if stuck)</h2>
+  <ul>
+    <li>Use OpenAI <b>structured outputs</b> with Pydantic models so extraction always returns valid JSON.</li>
+    <li>Modern OpenAI models can read a PDF passed directly in the request, so you may not need an OCR library.</li>
+    <li>Extract each document in a <b>separate</b> call. Ask yourself why that helps fraud detection.</li>
+    <li>Chunk the policy wording by clause, not by a fixed number of tokens.</li>
+    <li>Look at LangGraph's <code>interrupt()</code> and checkpointers for pause/resume.</li>
+    <li>Money and thresholds belong in plain Python. LLMs read and judge; code calculates.</li>
+    <li>Your eval labels contain the correct payable amount. A wrong amount almost always means the survey table was read wrongly.</li>
+  </ul>
+</section>
+
+<section id="cv">
+  <h2><span class="num">10</span>What goes on your CV</h2>
+  <div class="callout ok">
+    Built <b>ClaimSense</b>, a multi-agent motor insurance claims system (LangGraph, OpenAI, FastAPI): reads claim PDFs,
+    decides coverage with clause-cited RAG and routes claims to auto-approval, adjusters or a fraud unit with
+    human-in-the-loop. Achieved <b>X%</b> routing accuracy and <b>Y%</b> fraud recall on a labelled test set at
+    <b>₹Z per claim</b>; deployed on AWS ECS Fargate with Terraform.
+  </div>
+  <p>Replace X, Y, Z with <b>your own</b> eval numbers. Never put a number on your CV that you can't reproduce live.</p>
+  <h3>Stretch goals (pick one to stand out)</h3>
+  <ul>
+    <li>Accept damage photos and let the model compare them with the surveyor's damaged areas.</li>
+    <li>Add a WhatsApp or email intake channel.</li>
+    <li>Swap SQLite for PostgreSQL (Amazon RDS) and use LangGraph's Postgres checkpointer.</li>
+    <li>Add tracing (LangSmith or Langfuse) and a dashboard of cost and latency per step.</li>
+    <li>Add 30 more labelled claims, including tricky ones you design yourself.</li>
+  </ul>
+</section>
+</main>
+<footer>ClaimSense · Problem statement by <b>Shivank Agrawal</b> · All companies, people and documents are fictional and for teaching only.</footer>
+</body>
+</html>
